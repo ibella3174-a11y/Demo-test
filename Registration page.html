@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - ScaleHeight</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* CSS Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: white;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container { width: 100%; max-width: 400px; padding: 20px; }
+
+    .logo {
+      display: block; width: 64px; height: 64px;
+      margin: 0 auto 20px; border-radius: 50%; object-fit: cover;
+    }
+
+    .login-box {
+      background: #c8f0ff;
+      padding: 30px 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 200, 255, 0.15);
+    }
+
+    h2 { font-size: 24px; text-align: center; margin-bottom: 10px; }
+    .signup-text { font-size: 14px; text-align: center; margin-bottom: 20px; }
+    .signup-text a { color: #007bff; text-decoration: none; font-weight: bold; }
+
+    label { display: block; font-size: 14px; margin-top: 15px; margin-bottom: 5px; font-weight: 600; }
+    
+    /* Password wrapper for the eye icon */
+    .input-wrapper { position: relative; width: 100%; }
+    
+    input {
+      width: 100%; padding: 12px; font-size: 14px;
+      border: 1px solid #ccc; border-radius: 10px;
+      background-color: white; color: black;
+    }
+
+    .toggle-password {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%); cursor: pointer; color: #666;
+    }
+
+    button {
+      width: 100%; padding: 12px; margin-top: 25px;
+      border: none; border-radius: 10px;
+      background: linear-gradient(90deg, #007bff, #00d1ff);
+      color: white; font-weight: bold; font-size: 16px;
+      cursor: pointer; transition: 0.3s;
+    }
+    button:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d?w=800&q=60" alt="Logo" class="logo" />
+      
+    <div class="login-box">
+      <h2>Create your account</h2>
+      <p class="signup-text">Already have an account? <a href="Login.html">Sign in</a></p>
+      
+      <form onsubmit="return register(event)">
+        <label>Full Name</label>
+        <input type="text" id="fullName" placeholder="John Doe" required />
+        
+        <label>Username</label>
+        <input type="text" id="username" placeholder="johndoe123" required />
+        
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="email@example.com" required />
+
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="+234..." required />
+        
+        <label>Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="password" required minlength="6" />
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePass('password', this)"></i>
+        </div>
+        
+        <label>Confirm Password</label>
+        <div class="input-wrapper">
+          <input type="password" id="confirmPassword" required />
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePass('confirmPassword', this)"></i>
+        </div>
+        
+        <button type="submit" id="regBtn">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabase = createClient(
+      'https://shpryivdpklqpbfciaiq.supabase.co',
+      'sb_publishable_arDyw_TjvnWYItAHhVqLBQ_jeJUZjQe'
+    )
+    window.togglePass = function(id, icon) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+      }
+    }
+
+    window.register = async function (e) {
+      e.preventDefault();
+      const btn = document.getElementById('regBtn');
+      
+      const fullName = document.getElementById('fullName').value;
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Processing...";
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: 'https://testing-demo09.netlify.app/update-password.html',
+          data: {
+            full_name: fullName,
+            username: username,
+            phone_number: phone // Storing phone in metadata
+          }
+        }
+      });
+
+      if (error) {
+        alert(error.message);
+        btn.disabled = false;
+        btn.innerText = "Create Account";
+        return;
+      }
+
+      alert("Account created! Please verify your email.");
+      window.location.href = "Login.html";
+    }
+  </script>
+</body>
+</html>
