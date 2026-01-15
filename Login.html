@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - ScaleHeight</title>
+</head>
+<body>
+  <div class="container">
+    <div class="login-box">
+      <img src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d?w=800&q=60" alt="Logo" class="logo" />
+
+      <h2>Sign in to ScaleHeight</h2>
+      <p class="signup-text">Or <a href="Registration page.html">create a new account</a></p>
+
+      <form onsubmit="return login(event)">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required />
+
+        <div class="options">
+          <label><input type="checkbox" /> Remember me</label>
+          <a href="forgot-password.html">Forgot password?</a>
+        </div>
+
+        <button type="submit">Sign in</button>
+      </form>
+    </div>
+  </div>
+
+  <style>
+    /* YOUR EXISTING CSS (Unchanged) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color:white; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    .container { width: 100%; max-width: 400px; padding: 20px; }
+    .login-box { background-color:#c8f0ff; padding: 30px; border-radius: 16px; box-shadow: 0 0 10px rgba(0, 200, 255, 0.1); }
+    .logo { display: block; margin: 0 auto 20px; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid #00ccff; }
+    h2 { text-align: center; margin-bottom: 10px; color: black; }
+    .signup-text { text-align: center; color: #aaa; margin-bottom: 20px; }
+    .signup-text a { color: #00ccff; text-decoration: none; }
+    form { display: flex; flex-direction: column; }
+    form input:focus { outline: 2px solid #00d1ff; }
+    label { margin-bottom: 6px; font-size: 0.9em; font-weight: bold; color: black; }
+    input[type="email"], input[type="password"] { padding: 12px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 14px; background-color: white; color: black; }
+    input::placeholder { color: #777; }
+    .options { display: flex; justify-content: space-between; align-items: center; font-size: 0.85em; color: #aaa; margin-bottom: 20px; }
+    .options a { color: black; text-decoration: none; }
+    .options label { display: flex; align-items: center; gap: 6px; color: #aaa; }
+    button { padding: 12px; border: none; border-radius: 8px; background: linear-gradient(90deg, #007bff, #00e5ff); color: #fff; font-weight: bold; font-size: 1em; cursor: pointer; transition: background 0.3s ease; }
+    button:hover { opacity: 0.9; }
+  </style>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    // Connect to your specific Supabase project
+    const supabase = createClient(
+      'https://shpryivdpklqpbfciaiq.supabase.co',
+      'sb_publishable_arDyw_TjvnWYItAHhVqLBQ_jeJUZjQe'
+    )
+
+    window.login = async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      // This is the magic line that checks the real database
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      })
+
+      if (error) {
+  const goRegister = confirm(
+    "Invalid login details.\n\nDon't have an account? Proceed to register now!"
+  );
+
+  if (goRegister) {
+    window.location.href = "Registration page.html";
+  }
+}
+       else {
+        // Success!
+        console.log("User logged in:", data);
+        window.location.href = "Dashboard.html";
+      }
+    }
+  </script>
+</body>
+</html>
